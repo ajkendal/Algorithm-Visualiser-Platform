@@ -19,7 +19,6 @@ import { Link, useLocation } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle'
 
 const Navbar = ({ theme, onThemeChange }) => {
-  const isDark = theme === 'dark'
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProductsOpen, setIsProductsOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
@@ -101,16 +100,8 @@ const Navbar = ({ theme, onThemeChange }) => {
         fixed top-0 left-0 right-0 z-50 transition-all duration-200
         ${
           isScrolled
-            ? `backdrop-blur-xl border-b ${
-                isDark
-                  ? 'bg-gray-900/80 border-gray-800'
-                  : 'bg-white/80 border-gray-200'
-              }`
-            : `backdrop-blur-sm ${
-                isDark
-                  ? 'bg-gray-900/40 border-gray-800/40'
-                  : 'bg-white/40 border-gray-200/40'
-              } border-b`
+            ? `backdrop-blur-xl border-b bg-white/80 border-gray-200  dark:bg-gray-900/80 dark:border-gray-800`
+            : `backdrop-blur-sm bg-white/40 border-gray-200/40 dark:bg-gray-900/40 dark:border-gray-800/40 border-b`
         }
       `}
       >
@@ -122,14 +113,11 @@ const Navbar = ({ theme, onThemeChange }) => {
                 to='/'
                 className={`
                   flex items-center space-x-3 font-bold text-xl
-                  transition-colors duration-200 focus-visible:outline-none 
+                  transition-colors duration-200 focus-visible:outline-none
                   focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
                   rounded-lg px-2 py-1
-                  ${
-                    isDark
-                      ? 'text-white hover:text-blue-400 focus-visible:ring-offset-gray-900'
-                      : 'text-gray-900 hover:text-blue-600 focus-visible:ring-offset-white'
-                  }
+                  text-gray-900 hover:text-blue-600 focus-visible:ring-offset-white
+                  dark:text-white dark:hover:text-blue-400 dark:focus-visible:ring-offset-gray-900
                 `}
               >
                 <div
@@ -155,13 +143,10 @@ const Navbar = ({ theme, onThemeChange }) => {
                       px-3 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2
                       focus-visible:outline-none focus-visible:ring-2 
                       focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                      ${
-                        isActive(path)
-                          ? 'bg-blue-600 text-white'
-                          : isDark
-                          ? 'text-gray-300 hover:text-white hover:bg-gray-700'
-                          : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                      }
+
+                      text-gray-700 hover:text-gray-900 hover:bg-gray-100
+                      dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700
+                      ${isActive(path) ? 'bg-blue-600 text-white' : ''}
                     `}
                   >
                     <Icon className='h-4 w-4' />
@@ -185,11 +170,8 @@ const Navbar = ({ theme, onThemeChange }) => {
                   p-2 rounded-lg transition-colors duration-200
                   focus-visible:outline-none focus-visible:ring-2
                   focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                  ${
-                    isDark
-                      ? 'hover:bg-gray-800 text-gray-300 hover:text-white focus-visible:ring-offset-gray-900'
-                      : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900 focus-visible:ring-offset-white'
-                  }
+                  hover:bg-gray-100 text-gray-600 hover:text-gray-900 focus-visible:ring-offset-white
+                  dark:hover:bg-gray-800 dark:text-gray-300 dark:hover:text-white dark:focus-visible:ring-offset-gray-900
                 `}
               >
                 {isMenuOpen ? (
@@ -206,13 +188,7 @@ const Navbar = ({ theme, onThemeChange }) => {
         {isMenuOpen && (
           <div
             className={`
-            md:hidden border-t backdrop-blur-xl
-            ${
-              isDark
-                ? 'bg-gray-900/95 border-gray-800'
-                : 'bg-white/95 border-gray-200'
-            }
-          `}
+            md:hidden border-t backdrop-blur-xl bg-white/95 border-gray-200 dark:bg-gray-900/95 dark:border-gray-800`}
           >
             <div className='px-4 py-3 space-y-1'>
               {navItems.map(({ path, label, icon: Icon }) => (
@@ -222,22 +198,14 @@ const Navbar = ({ theme, onThemeChange }) => {
                   className={`
                     flex items-center space-x-3 px-3 py-2 rounded-lg
                     transition-colors duration-200
-                    focus-visible:outline-none focus-visible:ring-2 
+                    focus-visible:outline-none focus-visible:ring-2
                     focus-visible:ring-blue-500 focus-visible:ring-offset-2
+                    hover:bg-gray-100 focus-visible:ring-offset-white
+                    dark:hover:bg-gray-800 dark:focus-visible:ring-offset-gray-900
                     ${
-                      isDark
-                        ? `hover:bg-gray-800 focus-visible:ring-offset-gray-900
-                         ${
-                           isActive(path)
-                             ? 'bg-gray-800 text-white'
-                             : 'text-gray-300'
-                         }`
-                        : `hover:bg-gray-100 focus-visible:ring-offset-white
-                         ${
-                           isActive(path)
-                             ? 'bg-gray-100 text-gray-900'
-                             : 'text-gray-600'
-                         }`
+                      isActive(path)
+                        ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
+                        : 'text-gray-600 dark:text-gray-300'
                     }
                   `}
                 >
@@ -255,14 +223,10 @@ const Navbar = ({ theme, onThemeChange }) => {
                     text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600
                     text-white hover:from-blue-700 hover:to-purple-700
                     transition-all duration-200
-                    focus-visible:outline-none focus-visible:ring-2 
+                    focus-visible:outline-none focus-visible:ring-2
                     focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                    ${
-                      isDark
-                        ? 'focus-visible:ring-offset-gray-900'
-                        : 'focus-visible:ring-offset-white'
-                    }
-                  `}
+                    focus-visible:ring-offset-white
+                    dark:focus-visible:ring-offset-gray-900`}
                 >
                   Get Started
                 </Link>
