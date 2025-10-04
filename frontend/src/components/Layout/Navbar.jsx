@@ -1,18 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, ChevronDown, User, Settings, LogOut, Zap, BarChart3, Network, Code, BookOpen, Type, Layers, Info } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
-import ThemeToggle from './ThemeToggle';
+import React, { useState, useEffect, useRef } from 'react'
+import {
+  Menu,
+  X,
+  ChevronDown,
+  User,
+  Settings,
+  LogOut,
+  Zap,
+  BarChart3,
+  Network,
+  Code,
+  BookOpen,
+  Type,
+  Layers,
+  Info,
+} from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import ThemeToggle from './ThemeToggle'
 
 const Navbar = ({ theme, onThemeChange }) => {
-  const isDark = theme === 'dark';
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isProductsOpen, setIsProductsOpen] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const location = useLocation();
-  
-  const productsRef = useRef(null);
-  const profileRef = useRef(null);
+  const isDark = theme === 'dark'
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isProductsOpen, setIsProductsOpen] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const location = useLocation()
+
+  const productsRef = useRef(null)
+  const profileRef = useRef(null)
 
   // Design tokens
   const spacing = {
@@ -21,8 +36,8 @@ const Navbar = ({ theme, onThemeChange }) => {
     md: '12px',
     lg: '16px',
     xl: '24px',
-    '2xl': '32px'
-  };
+    '2xl': '32px',
+  }
 
   const typography = {
     xs: '12px',
@@ -30,8 +45,8 @@ const Navbar = ({ theme, onThemeChange }) => {
     base: '16px',
     lg: '18px',
     xl: '20px',
-    '2xl': '24px'
-  };
+    '2xl': '24px',
+  }
 
   // Navigation items
   const navItems = [
@@ -41,92 +56,97 @@ const Navbar = ({ theme, onThemeChange }) => {
     { path: '/string', label: 'String', icon: Type },
     { path: '/dp', label: 'DP', icon: Layers },
     { path: '/about', label: 'About', icon: Info },
-    { path: '/docs', label: 'Docs', icon: BookOpen }
-  ];
+    { path: '/docs', label: 'Docs', icon: BookOpen },
+  ]
 
   // Scroll detection
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+      setIsScrolled(window.scrollY > 10)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (productsRef.current && !productsRef.current.contains(event.target)) {
-        setIsProductsOpen(false);
+        setIsProductsOpen(false)
       }
       if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setIsProfileOpen(false);
+        setIsProfileOpen(false)
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Close mobile menu on route change
   useEffect(() => {
-    setIsMenuOpen(false);
-    setIsProductsOpen(false);
-    setIsProfileOpen(false);
-  }, [location]);
+    setIsMenuOpen(false)
+    setIsProductsOpen(false)
+    setIsProfileOpen(false)
+  }, [location])
 
   const isActive = (path) => {
-    return location.pathname === path;
-  };
+    return location.pathname === path
+  }
 
   return (
     <>
       {/* Navbar */}
-      <nav className={`
+      <nav
+        className={`
         fixed top-0 left-0 right-0 z-50 transition-all duration-200
-        ${isScrolled 
-          ? `backdrop-blur-xl border-b ${
-              isDark 
-                ? 'bg-gray-900/80 border-gray-800' 
-                : 'bg-white/80 border-gray-200'
-            }` 
-          : `backdrop-blur-sm ${
-              isDark 
-                ? 'bg-gray-900/40 border-gray-800/40' 
-                : 'bg-white/40 border-gray-200/40'
-            } border-b`
+        ${
+          isScrolled
+            ? `backdrop-blur-xl border-b ${
+                isDark
+                  ? 'bg-gray-900/80 border-gray-800'
+                  : 'bg-white/80 border-gray-200'
+              }`
+            : `backdrop-blur-sm ${
+                isDark
+                  ? 'bg-gray-900/40 border-gray-800/40'
+                  : 'bg-white/40 border-gray-200/40'
+              } border-b`
         }
-      `}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            
+      `}
+      >
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <div className='flex items-center justify-between h-16'>
             {/* Logo */}
-            <div className="flex-shrink-0">
-              <Link 
-                to="/" 
+            <div className='flex-shrink-0'>
+              <Link
+                to='/'
                 className={`
                   flex items-center space-x-3 font-bold text-xl
                   transition-colors duration-200 focus-visible:outline-none 
                   focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
                   rounded-lg px-2 py-1
-                  ${isDark 
-                    ? 'text-white hover:text-blue-400 focus-visible:ring-offset-gray-900' 
-                    : 'text-gray-900 hover:text-blue-600 focus-visible:ring-offset-white'
+                  ${
+                    isDark
+                      ? 'text-white hover:text-blue-400 focus-visible:ring-offset-gray-900'
+                      : 'text-gray-900 hover:text-blue-600 focus-visible:ring-offset-white'
                   }
                 `}
               >
-                <div className={`
+                <div
+                  className={`
                   w-8 h-8 rounded-lg flex items-center justify-center
                   bg-gradient-to-br from-blue-600 to-purple-600
-                `}>
-                  <Zap className="h-5 w-5 text-white" />
+                `}
+                >
+                  <Zap className='h-5 w-5 text-white' />
                 </div>
                 <span>AlgoViz Pro</span>
               </Link>
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-1">
+            <div className='hidden md:block'>
+              <div className='ml-10 flex items-baseline space-x-1'>
                 {navItems.map(({ path, label, icon: Icon }) => (
                   <Link
                     key={path}
@@ -135,16 +155,16 @@ const Navbar = ({ theme, onThemeChange }) => {
                       px-3 py-2 rounded-md text-sm font-medium transition-all flex items-center space-x-2
                       focus-visible:outline-none focus-visible:ring-2 
                       focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                      ${isActive(path)
-                        ? 'bg-blue-600 text-white'
-                        : (isDark 
-                            ? 'text-gray-300 hover:text-white hover:bg-gray-700' 
-                            : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                          )
+                      ${
+                        isActive(path)
+                          ? 'bg-blue-600 text-white'
+                          : isDark
+                          ? 'text-gray-300 hover:text-white hover:bg-gray-700'
+                          : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                       }
                     `}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className='h-4 w-4' />
                     <span>{label}</span>
                   </Link>
                 ))}
@@ -152,26 +172,31 @@ const Navbar = ({ theme, onThemeChange }) => {
             </div>
 
             {/* Right side items */}
-            <div className="hidden md:flex items-center space-x-3">
+            <div className='hidden md:flex items-center space-x-3'>
               {/* Theme Toggle */}
               <ThemeToggle theme={theme} onToggle={onThemeChange} />
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className='md:hidden'>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`
                   p-2 rounded-lg transition-colors duration-200
-                  focus-visible:outline-none focus-visible:ring-2 
+                  focus-visible:outline-none focus-visible:ring-2
                   focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                  ${isDark 
-                    ? 'hover:bg-gray-800 text-gray-300 hover:text-white focus-visible:ring-offset-gray-900' 
-                    : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900 focus-visible:ring-offset-white'
+                  ${
+                    isDark
+                      ? 'hover:bg-gray-800 text-gray-300 hover:text-white focus-visible:ring-offset-gray-900'
+                      : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900 focus-visible:ring-offset-white'
                   }
                 `}
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? (
+                  <X className='h-6 w-6' />
+                ) : (
+                  <Menu className='h-6 w-6' />
+                )}
               </button>
             </div>
           </div>
@@ -179,11 +204,17 @@ const Navbar = ({ theme, onThemeChange }) => {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className={`
+          <div
+            className={`
             md:hidden border-t backdrop-blur-xl
-            ${isDark ? 'bg-gray-900/95 border-gray-800' : 'bg-white/95 border-gray-200'}
-          `}>
-            <div className="px-4 py-3 space-y-1">
+            ${
+              isDark
+                ? 'bg-gray-900/95 border-gray-800'
+                : 'bg-white/95 border-gray-200'
+            }
+          `}
+          >
+            <div className='px-4 py-3 space-y-1'>
               {navItems.map(({ path, label, icon: Icon }) => (
                 <Link
                   key={path}
@@ -193,23 +224,32 @@ const Navbar = ({ theme, onThemeChange }) => {
                     transition-colors duration-200
                     focus-visible:outline-none focus-visible:ring-2 
                     focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                    ${isDark 
-                      ? `hover:bg-gray-800 focus-visible:ring-offset-gray-900
-                         ${isActive(path) ? 'bg-gray-800 text-white' : 'text-gray-300'}`
-                      : `hover:bg-gray-100 focus-visible:ring-offset-white
-                         ${isActive(path) ? 'bg-gray-100 text-gray-900' : 'text-gray-600'}`
+                    ${
+                      isDark
+                        ? `hover:bg-gray-800 focus-visible:ring-offset-gray-900
+                         ${
+                           isActive(path)
+                             ? 'bg-gray-800 text-white'
+                             : 'text-gray-300'
+                         }`
+                        : `hover:bg-gray-100 focus-visible:ring-offset-white
+                         ${
+                           isActive(path)
+                             ? 'bg-gray-100 text-gray-900'
+                             : 'text-gray-600'
+                         }`
                     }
                   `}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span className="text-sm font-medium">{label}</span>
+                  <Icon className='h-4 w-4' />
+                  <span className='text-sm font-medium'>{label}</span>
                 </Link>
               ))}
-              
+
               {/* Mobile CTA */}
-              <div className="pt-3 mt-3 border-t border-gray-700">
+              <div className='pt-3 mt-3 border-t border-gray-700'>
                 <Link
-                  to="/get-started"
+                  to='/get-started'
                   className={`
                     w-full flex items-center justify-center px-4 py-2 rounded-lg
                     text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600
@@ -217,7 +257,11 @@ const Navbar = ({ theme, onThemeChange }) => {
                     transition-all duration-200
                     focus-visible:outline-none focus-visible:ring-2 
                     focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                    ${isDark ? 'focus-visible:ring-offset-gray-900' : 'focus-visible:ring-offset-white'}
+                    ${
+                      isDark
+                        ? 'focus-visible:ring-offset-gray-900'
+                        : 'focus-visible:ring-offset-white'
+                    }
                   `}
                 >
                   Get Started
@@ -229,9 +273,9 @@ const Navbar = ({ theme, onThemeChange }) => {
       </nav>
 
       {/* Spacer to prevent content from hiding behind fixed navbar */}
-      <div className="h-16" />
+      <div className='h-16' />
     </>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar

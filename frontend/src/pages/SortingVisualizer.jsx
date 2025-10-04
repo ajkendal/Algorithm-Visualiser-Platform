@@ -1,101 +1,105 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Zap, Settings, BookOpen, Download } from 'lucide-react';
-import toast from 'react-hot-toast';
-import SortingCanvas from '../components/Sorting/SortingCanvas';
-import ArrayInput from '../components/Sorting/ArrayInput';
-import ControlPanel from '../components/Sorting/ControlPanel';
-import ComplexityDisplay from '../components/Sorting/ComplexityDisplay';
-import { sortingService } from '../services/api';
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { Zap, Settings, BookOpen, Download } from 'lucide-react'
+import toast from 'react-hot-toast'
+import SortingCanvas from '../components/Sorting/SortingCanvas'
+import ArrayInput from '../components/Sorting/ArrayInput'
+import ControlPanel from '../components/Sorting/ControlPanel'
+import ComplexityDisplay from '../components/Sorting/ComplexityDisplay'
+import { sortingService } from '../services/api'
 
-const SortingVisualizer = ({ darkMode, setDarkMode }) => {
-  const [array, setArray] = useState([64, 34, 25, 12, 22, 11, 90]);
-  const [algorithm, setAlgorithm] = useState('bubble');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [steps, setSteps] = useState([]);
-  const [speed, setSpeed] = useState(700);
-  const [isLoading, setIsLoading] = useState(false);
-  const [arraySize, setArraySize] = useState(7);
-  const [showParticles] = useState(true);
-  const [typewriterText, setTypewriterText] = useState('');
-  const [showDetailedLog, setShowDetailedLog] = useState(false);
-  const [timeoutDetected, setTimeoutDetected] = useState(false);
-  const canvasRef = useRef(null);
-  const particleCanvasRef = useRef(null);
-  const timeoutCountRef = useRef(0);
-  const lastTimeoutCheck = useRef(Date.now());
+const SortingVisualizer = ({ darkMode }) => {
+  const [array, setArray] = useState([64, 34, 25, 12, 22, 11, 90])
+  const [algorithm, setAlgorithm] = useState('bubble')
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentStep, setCurrentStep] = useState(0)
+  const [steps, setSteps] = useState([])
+  const [speed, setSpeed] = useState(700)
+  const [isLoading, setIsLoading] = useState(false)
+  const [arraySize, setArraySize] = useState(7)
+  const [showParticles] = useState(true)
+  const [typewriterText, setTypewriterText] = useState('')
+  const [showDetailedLog, setShowDetailedLog] = useState(false)
+  const [timeoutDetected, setTimeoutDetected] = useState(false)
+  const canvasRef = useRef(null)
+  const particleCanvasRef = useRef(null)
+  const timeoutCountRef = useRef(0)
+  const lastTimeoutCheck = useRef(Date.now())
 
   const algorithms = [
-    { 
-      id: 'bubble', 
-      name: 'Bubble Sort', 
-      complexity: 'O(n²)', 
+    {
+      id: 'bubble',
+      name: 'Bubble Sort',
+      complexity: 'O(n²)',
       color: '#ef4444',
       description: 'Simple comparison-based algorithm',
-      explanation: 'Bubble Sort repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.',
+      explanation:
+        'Bubble Sort repeatedly steps through the list, compares adjacent elements and swaps them if they are in the wrong order.',
       preview: '🔄 Compares adjacent elements and swaps them',
       category: 'Simple',
       bestCase: 'O(n)',
       worstCase: 'O(n²)',
-      stable: true
+      stable: true,
     },
-    { 
-      id: 'merge', 
-      name: 'Merge Sort', 
-      complexity: 'O(n log n)', 
+    {
+      id: 'merge',
+      name: 'Merge Sort',
+      complexity: 'O(n log n)',
       color: '#10b981',
       description: 'Divide and conquer algorithm',
-      explanation: 'Merge Sort divides the array into two halves, recursively sorts them, and then merges the sorted halves.',
+      explanation:
+        'Merge Sort divides the array into two halves, recursively sorts them, and then merges the sorted halves.',
       preview: '✂️ Divides array, then merges sorted halves',
       category: 'Efficient',
       bestCase: 'O(n log n)',
       worstCase: 'O(n log n)',
-      stable: true
+      stable: true,
     },
-    { 
-      id: 'quick', 
-      name: 'Quick Sort', 
-      complexity: 'O(n log n)', 
+    {
+      id: 'quick',
+      name: 'Quick Sort',
+      complexity: 'O(n log n)',
       color: '#3b82f6',
       description: 'Fast divide and conquer',
-      explanation: 'Quick Sort picks a pivot element and partitions the array around it, then recursively sorts the sub-arrays.',
+      explanation:
+        'Quick Sort picks a pivot element and partitions the array around it, then recursively sorts the sub-arrays.',
       preview: '🎯 Uses pivot to partition and sort',
       category: 'Efficient',
       bestCase: 'O(n log n)',
       worstCase: 'O(n²)',
-      stable: false
+      stable: false,
     },
-    { 
-      id: 'heap', 
-      name: 'Heap Sort', 
-      complexity: 'O(n log n)', 
+    {
+      id: 'heap',
+      name: 'Heap Sort',
+      complexity: 'O(n log n)',
       color: '#8b5cf6',
       description: 'Binary heap based sorting',
-      explanation: 'Heap Sort builds a max heap from the array, then repeatedly extracts the maximum element.',
+      explanation:
+        'Heap Sort builds a max heap from the array, then repeatedly extracts the maximum element.',
       preview: '🏗️ Builds heap structure for sorting',
       category: 'Efficient',
       bestCase: 'O(n log n)',
       worstCase: 'O(n log n)',
-      stable: false
+      stable: false,
     },
-    { 
-      id: 'counting', 
-      name: 'Counting Sort', 
-      complexity: 'O(n + k)', 
+    {
+      id: 'counting',
+      name: 'Counting Sort',
+      complexity: 'O(n + k)',
       color: '#f59e0b',
       description: 'Non-comparison based algorithm',
-      explanation: 'Counting Sort counts the occurrences of each element and uses this information to place elements in sorted order.',
+      explanation:
+        'Counting Sort counts the occurrences of each element and uses this information to place elements in sorted order.',
       preview: '🔢 Counts elements to determine positions',
       category: 'Special',
       bestCase: 'O(n + k)',
       worstCase: 'O(n + k)',
-      stable: true
-    }
-  ];
-
+      stable: true,
+    },
+  ]
 
   // Move selectedAlgorithm definition here, before useEffect hooks
-  const selectedAlgorithm = algorithms.find(a => a.id === algorithm);
+  const selectedAlgorithm = algorithms.find((a) => a.id === algorithm)
 
   // Move currentStepData definition here, before useEffect hooks
   const currentStepData = steps[currentStep] || {
@@ -105,156 +109,157 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
     operation: 'Ready to start',
     operations_count: 0,
     time_complexity: 'O(n)',
-    space_complexity: 'O(1)'
-  };
+    space_complexity: 'O(1)',
+  }
 
   // Typewriter effect for step explanations
   useEffect(() => {
-    const text = getStepExplanation(currentStepData, selectedAlgorithm);
-    let index = 0;
-    setTypewriterText('');
-    
+    const text = getStepExplanation(currentStepData, selectedAlgorithm)
+    let index = 0
+    setTypewriterText('')
+
     const timer = setInterval(() => {
       if (index < text.length) {
-        setTypewriterText(text.slice(0, index + 1));
-        index++;
+        setTypewriterText(text.slice(0, index + 1))
+        index++
       } else {
-        clearInterval(timer);
+        clearInterval(timer)
       }
-    }, 30);
+    }, 30)
 
-    return () => clearInterval(timer);
-  }, [currentStep, steps, selectedAlgorithm, currentStepData]); // Add currentStepData as dependency
+    return () => clearInterval(timer)
+  }, [currentStep, steps, selectedAlgorithm, currentStepData]) // Add currentStepData as dependency
 
   // Monitor for timeout loops
   useEffect(() => {
     const checkTimeouts = () => {
-      const now = Date.now();
+      const now = Date.now()
       if (now - lastTimeoutCheck.current < 1000) {
-        timeoutCountRef.current++;
+        timeoutCountRef.current++
         if (timeoutCountRef.current > 5) {
-          setTimeoutDetected(true);
-          console.warn('Timeout loop detected, disabling problematic features');
+          setTimeoutDetected(true)
+          console.warn('Timeout loop detected, disabling problematic features')
         }
       } else {
-        timeoutCountRef.current = 0;
-        lastTimeoutCheck.current = now;
+        timeoutCountRef.current = 0
+        lastTimeoutCheck.current = now
       }
-    };
+    }
 
-    const interval = setInterval(checkTimeouts, 1000);
-    return () => clearInterval(interval);
-  }, []);
+    const interval = setInterval(checkTimeouts, 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   // Disable particle system if timeouts detected
-  const shouldShowParticles = showParticles && !timeoutDetected;
+  const shouldShowParticles = showParticles && !timeoutDetected
 
   // Particle system
   useEffect(() => {
-    if (!shouldShowParticles || !particleCanvasRef.current) return;
+    if (!shouldShowParticles || !particleCanvasRef.current) return
 
-    let animationId;
-    const canvas = particleCanvasRef.current;
-    
+    let animationId
+    const canvas = particleCanvasRef.current
+
     try {
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d')
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
 
-      const particles = [];
-      for (let i = 0; i < 30; i++) { // Reduced particles
+      const particles = []
+      for (let i = 0; i < 30; i++) {
+        // Reduced particles
         particles.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           vx: (Math.random() - 0.5) * 0.3,
           vy: (Math.random() - 0.5) * 0.3,
           size: Math.random() * 1.5 + 0.5,
-          opacity: Math.random() * 0.3 + 0.1
-        });
+          opacity: Math.random() * 0.3 + 0.1,
+        })
       }
 
       const animate = () => {
-        if (!shouldShowParticles) return;
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        particles.forEach(particle => {
-          particle.x += particle.vx;
-          particle.y += particle.vy;
+        if (!shouldShowParticles) return
 
-          if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
-          if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-          ctx.beginPath();
-          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(59, 130, 246, ${particle.opacity})`;
-          ctx.fill();
-        });
+        particles.forEach((particle) => {
+          particle.x += particle.vx
+          particle.y += particle.vy
 
-        animationId = requestAnimationFrame(animate);
-      };
+          if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1
+          if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1
 
-      animate();
+          ctx.beginPath()
+          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(59, 130, 246, ${particle.opacity})`
+          ctx.fill()
+        })
+
+        animationId = requestAnimationFrame(animate)
+      }
+
+      animate()
     } catch (error) {
-      console.error('Particle system error:', error);
+      console.error('Particle system error:', error)
     }
 
     return () => {
       if (animationId) {
-        cancelAnimationFrame(animationId);
+        cancelAnimationFrame(animationId)
       }
-    };
-  }, [shouldShowParticles]);
+    }
+  }, [shouldShowParticles])
 
   // Dynamic array size change
   useEffect(() => {
-    const newArray = Array.from({ length: arraySize }, (_, i) => 
+    const newArray = Array.from({ length: arraySize }, (_, i) =>
       i < array.length ? array[i] : Math.floor(Math.random() * 80) + 10
-    );
-    setArray(newArray);
-    reset();
-  }, [arraySize]);
+    )
+    setArray(newArray)
+    reset()
+  }, [arraySize])
 
   // Get detailed step explanation
   const getStepExplanation = (stepData, selectedAlgo) => {
-    if (!stepData.operation) return '';
-    
-    const operation = stepData.operation.toLowerCase();
-    
+    if (!stepData.operation) return ''
+
+    const operation = stepData.operation.toLowerCase()
+
     if (operation.includes('comparing')) {
-      return `🔍 Comparison: The algorithm is checking if elements need to be swapped based on their values. This is the core operation of most sorting algorithms.`;
+      return `🔍 Comparison: The algorithm is checking if elements need to be swapped based on their values. This is the core operation of most sorting algorithms.`
     }
     if (operation.includes('swap')) {
-      return `🔄 Swap: Two elements are being exchanged because they were found to be in the wrong order. This moves us closer to the final sorted array.`;
+      return `🔄 Swap: Two elements are being exchanged because they were found to be in the wrong order. This moves us closer to the final sorted array.`
     }
     if (operation.includes('divide') || operation.includes('dividing')) {
-      return `✂️ Divide: The array is being split into smaller sub-arrays. This is the "divide" part of the divide-and-conquer strategy.`;
+      return `✂️ Divide: The array is being split into smaller sub-arrays. This is the "divide" part of the divide-and-conquer strategy.`
     }
     if (operation.includes('merge')) {
-      return `🔗 Merge: Two sorted sub-arrays are being combined into a single sorted array. This is the "conquer" part of merge sort.`;
+      return `🔗 Merge: Two sorted sub-arrays are being combined into a single sorted array. This is the "conquer" part of merge sort.`
     }
     if (operation.includes('pivot')) {
-      return `🎯 Pivot Selection: A pivot element is chosen to partition the array. All smaller elements go to the left, larger ones to the right.`;
+      return `🎯 Pivot Selection: A pivot element is chosen to partition the array. All smaller elements go to the left, larger ones to the right.`
     }
     if (operation.includes('heap')) {
-      return `🏗️ Heap Operation: The algorithm is maintaining the heap property - parent nodes are larger than their children.`;
+      return `🏗️ Heap Operation: The algorithm is maintaining the heap property - parent nodes are larger than their children.`
     }
     if (operation.includes('count')) {
-      return `🔢 Counting: The algorithm is counting occurrences of each value to determine their final positions without comparisons.`;
+      return `🔢 Counting: The algorithm is counting occurrences of each value to determine their final positions without comparisons.`
     }
     if (operation.includes('complete')) {
-      return `✅ Sorting Complete: The array is now fully sorted! All elements are in their correct positions.`;
+      return `✅ Sorting Complete: The array is now fully sorted! All elements are in their correct positions.`
     }
     if (operation.includes('start')) {
-      return `🚀 Starting: The sorting algorithm is beginning. Initial array setup and preparation phase.`;
+      return `🚀 Starting: The sorting algorithm is beginning. Initial array setup and preparation phase.`
     }
-    
-    return `⚙️ Processing: The algorithm is performing internal operations to organize the data structure.`;
-  };
+
+    return `⚙️ Processing: The algorithm is performing internal operations to organize the data structure.`
+  }
 
   const executeAlgorithm = useCallback(async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(true)
       toast.loading('Executing algorithm...', {
         icon: '⚡',
         style: {
@@ -263,14 +268,14 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
           color: '#fff',
           backdropFilter: 'blur(10px)',
         },
-      });
-      
-      const response = await sortingService.runAlgorithm(algorithm, array);
-      
+      })
+
+      const response = await sortingService.runAlgorithm(algorithm, array)
+
       if (response.steps && Array.isArray(response.steps)) {
-        setSteps(response.steps);
-        setCurrentStep(0);
-        toast.dismiss();
+        setSteps(response.steps)
+        setCurrentStep(0)
+        toast.dismiss()
         toast.success(`${selectedAlgorithm?.name} executed successfully!`, {
           icon: '🎉',
           style: {
@@ -279,61 +284,62 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
             color: '#fff',
             boxShadow: `0 0 20px ${selectedAlgorithm?.color}40`,
           },
-        });
+        })
       } else {
-        throw new Error('Invalid response format');
+        throw new Error('Invalid response format')
       }
     } catch (error) {
-      toast.dismiss();
-      toast.error('Failed to execute algorithm');
-      console.error('Algorithm execution error:', error);
+      toast.dismiss()
+      toast.error('Failed to execute algorithm')
+      console.error('Algorithm execution error:', error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [algorithm, array, selectedAlgorithm, darkMode]);
+  }, [algorithm, array, selectedAlgorithm, darkMode])
 
   const playPause = () => {
     if (steps.length === 0) {
-      executeAlgorithm();
-      return;
+      executeAlgorithm()
+      return
     }
-    setIsPlaying(!isPlaying);
-  };
+    setIsPlaying(!isPlaying)
+  }
 
   const reset = () => {
-    setIsPlaying(false);
-    setCurrentStep(0);
-    setSteps([]);
-  };
+    setIsPlaying(false)
+    setCurrentStep(0)
+    setSteps([])
+  }
 
   const stepForward = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      setCurrentStep(currentStep + 1)
     }
-  };
+  }
 
   const stepBackward = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      setCurrentStep(currentStep - 1)
     }
-  };
+  }
 
   const generateRandomArray = () => {
-    const newArray = Array.from({ length: arraySize }, () => 
-      Math.floor(Math.random() * 80) + 10
-    );
-    setArray(newArray);
-    reset();
-  };
+    const newArray = Array.from(
+      { length: arraySize },
+      () => Math.floor(Math.random() * 80) + 10
+    )
+    setArray(newArray)
+    reset()
+  }
 
   const downloadVisualization = () => {
-    if (!canvasRef.current) return;
-    
-    const link = document.createElement('a');
-    link.download = `${algorithm}-sort-step-${currentStep + 1}.png`;
-    link.href = canvasRef.current.toDataURL();
-    link.click();
-    
+    if (!canvasRef.current) return
+
+    const link = document.createElement('a')
+    link.download = `${algorithm}-sort-step-${currentStep + 1}.png`
+    link.href = canvasRef.current.toDataURL()
+    link.click()
+
     toast.success('Visualization downloaded!', {
       icon: '📥',
       style: {
@@ -341,18 +347,18 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
         background: '#10b981',
         color: '#fff',
       },
-    });
-  };
+    })
+  }
 
   useEffect(() => {
     if (isPlaying && currentStep < steps.length - 1) {
       const timer = setTimeout(() => {
-        setCurrentStep(currentStep + 1);
-      }, speed);
-      
-      return () => clearTimeout(timer);
+        setCurrentStep(currentStep + 1)
+      }, speed)
+
+      return () => clearTimeout(timer)
     } else if (currentStep >= steps.length - 1 && isPlaying) {
-      setIsPlaying(false);
+      setIsPlaying(false)
       toast.success('🎉 Algorithm completed!', {
         style: {
           borderRadius: '12px',
@@ -360,63 +366,51 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
           color: '#fff',
           boxShadow: '0 0 30px #10b98140',
         },
-      });
+      })
     }
-  }, [isPlaying, currentStep, steps.length, speed]);
+  }, [isPlaying, currentStep, steps.length, speed])
 
   return (
-    <div className={`min-h-screen transition-all duration-500 ${
-      darkMode 
-        ? 'bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900' 
-        : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'
-    }`}>
+    <div
+      className='py-16 min-h-screen transition-all duration-500  bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 
+          dark:bg-gradient-to-br dark:from-gray-900 dark:via-blue-900 dark:to-purple-900'
+    >
       {/* Conditional Particle Background */}
       {shouldShowParticles && (
         <canvas
           ref={particleCanvasRef}
-          className="fixed inset-0 pointer-events-none z-0"
-          style={{ opacity: darkMode ? 0.4 : 0.2 }}
+          className='fixed inset-0 pointer-events-none z-0 opacity-20 dark:opacity-40'
         />
       )}
-
       {/* Timeout Warning */}
       {timeoutDetected && (
-        <div className="fixed top-20 right-4 z-50 bg-yellow-500 text-black p-3 rounded-lg shadow-lg">
+        <div className='fixed top-20 right-4 z-50 bg-yellow-500 text-black p-3 rounded-lg shadow-lg'>
           ⚠️ Performance issue detected. Some visual effects disabled.
         </div>
       )}
-
-      <div className="relative z-10 max-w-7xl mx-auto p-4">
-        <div className="grid lg:grid-cols-2 gap-8">
+      <div className='relative z-10 max-w-7xl mx-auto p-4'>
+        <div className='grid lg:grid-cols-2 gap-8'>
           {/* Left Panel - Enhanced Array & Controls */}
-          <div className="space-y-6">
-            <div className={`backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden ${
-              darkMode 
-                ? 'bg-gray-800/20 border-gray-700/50' 
-                : 'bg-white/20 border-white/50'
-            }`}>
-              <div className={`p-6 border-b ${darkMode ? 'border-gray-700/50' : 'border-white/50'}`}>
-                <h3 className={`text-xl font-bold flex items-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                  <Settings className="h-6 w-6 mr-3 text-blue-500" />
+          <div className='space-y-6'>
+            <div className='backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden bg-white/20 border-white/50 dark:bg-gray-800/20 dark:border-gray-700/50 '>
+              <div className='p-6 border-b border-white/50 dark:border-gray-700/50'>
+                <h3 className='*:text-xl font-bold flex items-center text-gray-800 dark:text-white'>
+                  <Settings className='h-6 w-6 mr-3 text-blue-500' />
                   Configuration & Controls
                 </h3>
-                
+
                 {/* Add algorithm selector here */}
-                <div className="mt-4">
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <div className='mt-4'>
+                  <label className='block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300'>
                     Algorithm
                   </label>
                   <select
                     value={algorithm}
                     onChange={(e) => {
-                      setAlgorithm(e.target.value);
-                      reset();
+                      setAlgorithm(e.target.value)
+                      reset()
                     }}
-                    className={`w-full p-3 rounded-lg border transition-all ${
-                      darkMode 
-                        ? 'bg-gray-800 border-gray-600 text-white' 
-                        : 'bg-white border-gray-300 text-gray-800'
-                    }`}
+                    className='w-full p-3 rounded-lg border transition-all bg-white border-gray-300 text-gray-800  dark:bg-gray-800 dark:border-gray-600 dark:text-white'
                   >
                     {algorithms.map((algo) => (
                       <option key={algo.id} value={algo.id}>
@@ -426,33 +420,39 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
                   </select>
                 </div>
               </div>
-              
-              <div className="p-6 space-y-8">
+
+              <div className='p-6 space-y-8'>
                 {/* Enhanced Array Section */}
                 <div>
-                  <h4 className={`text-lg font-semibold mb-4 flex items-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                    <span className="w-3 h-3 bg-blue-500 rounded-full mr-3 animate-pulse"></span>
+                  <h4 className='text-lg font-semibold mb-4 flex items-center text-gray-800 dark:text-white'>
+                    <span className='w-3 h-3 bg-blue-500 rounded-full mr-3 animate-pulse'></span>
                     Array Configuration
                   </h4>
-                  
+
                   {/* Array Size Slider */}
-                  <div className="mb-6">
-                    <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <div className='mb-6'>
+                    <label
+                      className={`block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300`}
+                    >
                       Array Size: {arraySize}
                     </label>
                     <input
-                      type="range"
-                      min="5"
-                      max="15"
+                      type='range'
+                      min='5'
+                      max='15'
                       value={arraySize}
                       onChange={(e) => setArraySize(parseInt(e.target.value))}
-                      className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      className='w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer'
                       style={{
-                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((arraySize - 5) / 10) * 100}%, #e5e7eb ${((arraySize - 5) / 10) * 100}%, #e5e7eb 100%)`
+                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${
+                          ((arraySize - 5) / 10) * 100
+                        }%, #e5e7eb ${
+                          ((arraySize - 5) / 10) * 100
+                        }%, #e5e7eb 100%)`,
                       }}
                     />
                   </div>
-                  
+
                   <ArrayInput
                     array={array}
                     onChange={setArray}
@@ -462,8 +462,10 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
 
                 {/* Enhanced Controls Section */}
                 <div>
-                  <h4 className={`text-lg font-semibold mb-4 flex items-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                    <span className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></span>
+                  <h4
+                    className={`text-lg font-semibold mb-4 flex items-center  text-gray-800 dark:text-white`}
+                  >
+                    <span className='w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse'></span>
                     Playback Controls
                   </h4>
                   <ControlPanel
@@ -477,20 +479,15 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
                     isLoading={isLoading}
                     onStepForward={stepForward}
                     onStepBackward={stepBackward}
-                    darkMode={darkMode}
                   />
                 </div>
 
                 {/* Download Button */}
                 <button
                   onClick={downloadVisualization}
-                  className={`w-full py-3 px-4 rounded-lg font-medium transition-all hover:scale-105 flex items-center justify-center space-x-2 ${
-                    darkMode 
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white' 
-                      : 'bg-purple-500 hover:bg-purple-600 text-white'
-                  }`}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-all hover:scale-105 flex items-center justify-center space-x-2 bg-purple-500 hover:bg-purple-600 text-white dark:bg-purple-600 dark:hover:bg-purple-700 dark:text-white`}
                 >
-                  <Download className="h-5 w-5" />
+                  <Download className='h-5 w-5' />
                   <span>Download Visualization</span>
                 </button>
               </div>
@@ -498,43 +495,51 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
           </div>
 
           {/* Right Panel - Enhanced Visualization */}
-          <div className="space-y-6">
-            <div className={`backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden ${
-              darkMode 
-                ? 'bg-gray-800/20 border-gray-700/50' 
-                : 'bg-white/20 border-white/50'
-            }`}>
+          <div className='space-y-6'>
+            <div
+              className={`backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden bg-white/20 border-white/50  dark:bg-gray-800/20 dark:border-gray-700/50`}
+            >
               {/* Visualization Header */}
-              <div className={`p-4 border-b ${darkMode ? 'border-gray-700/50' : 'border-white/50'}`}>
-                <div className="flex justify-between items-center">
+              <div
+                className={`p-4 border-b border-white/50 dark:border-gray-700/50`}
+              >
+                <div className='flex justify-between items-center'>
                   <div>
-                    <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                    <h3
+                      className={`text-xl font-bold text-gray-800  dark:text-white `}
+                    >
                       {selectedAlgorithm?.name} Visualization
                     </h3>
-                    <div className={`flex items-center space-x-4 text-sm mt-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      <span className="flex items-center space-x-1">
-                        <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-                        <span>Step {currentStep + 1} of {steps.length || 1}</span>
+                    <div
+                      className={`flex items-center space-x-4 text-sm mt-1 text-gray-600 dark:text-gray-300`}
+                    >
+                      <span className='flex items-center space-x-1'>
+                        <div className='w-2 h-2 rounded-full bg-blue-500 animate-pulse'></div>
+                        <span>
+                          Step {currentStep + 1} of {steps.length || 1}
+                        </span>
                       </span>
-                      <div className="flex items-center space-x-1">
-                        <Zap className="h-4 w-4 text-yellow-500" />
-                        <span>Ops: {currentStepData.operations_count || 0}</span>
+                      <div className='flex items-center space-x-1'>
+                        <Zap className='h-4 w-4 text-yellow-500' />
+                        <span>
+                          Ops: {currentStepData.operations_count || 0}
+                        </span>
                       </div>
                     </div>
                   </div>
-                  <div 
-                    className="px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg animate-pulse"
-                    style={{ 
+                  <div
+                    className='px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg animate-pulse'
+                    style={{
                       backgroundColor: selectedAlgorithm?.color,
-                      boxShadow: `0 0 20px ${selectedAlgorithm?.color}40`
+                      boxShadow: `0 0 20px ${selectedAlgorithm?.color}40`,
                     }}
                   >
                     {selectedAlgorithm?.complexity}
                   </div>
                 </div>
               </div>
-              
-              <div className="p-6">
+
+              <div className='p-6'>
                 {/* Enhanced Visualization Canvas */}
                 <SortingCanvas
                   ref={canvasRef}
@@ -549,62 +554,70 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
             </div>
 
             {/* Enhanced Step Explanation with Typewriter Effect */}
-            <div className={`backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden ${
-              darkMode 
-                ? 'bg-gray-800/20 border-gray-700/50' 
-                : 'bg-white/20 border-white/50'
-            }`}>
-              <div className={`p-4 border-b ${darkMode ? 'border-gray-700/50' : 'border-white/50'}`}>
-                <div className="flex justify-between items-center">
-                  <h4 className={`text-lg font-bold flex items-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                    <BookOpen className="h-5 w-5 mr-2 text-purple-500" />
+            <div
+              className={`backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden bg-white/20 border-white/50  dark:bg-gray-800/20 dark:border-gray-700/50`}
+            >
+              <div
+                className={`p-4 border-b border-white/50 dark:border-gray-700/50`}
+              >
+                <div className='flex justify-between items-center'>
+                  <h4
+                    className={`text-lg font-bold flex items-center text-gray-800 dark:text-white`}
+                  >
+                    <BookOpen className='h-5 w-5 mr-2 text-purple-500' />
                     Step Explanation
                   </h4>
                   <button
                     onClick={() => setShowDetailedLog(!showDetailedLog)}
-                    className={`text-sm px-3 py-1 rounded transition-colors ${
-                      darkMode 
-                        ? 'text-gray-300 hover:text-white hover:bg-gray-700' 
-                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
-                    }`}
+                    className={`text-sm px-3 py-1 rounded transition-colors text-gray-600 hover:text-gray-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700`}
                   >
                     {showDetailedLog ? 'Hide' : 'Show'} Detailed Log
                   </button>
                 </div>
               </div>
-              
-              <div className="p-4 space-y-4 max-h-80 overflow-y-auto">
-                <div className={`p-4 rounded-lg border-l-4 border-blue-500 ${
-                  darkMode ? 'bg-blue-900/20' : 'bg-blue-50'
-                }`}>
-                  <p className={`text-sm font-medium mb-1 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+
+              <div className='p-4 space-y-4 max-h-80 overflow-y-auto'>
+                <div
+                  className={`p-4 rounded-lg border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20`}
+                >
+                  <p
+                    className={`text-sm font-medium mb-1  text-gray-800 dark:text-white `}
+                  >
                     Current Operation:
                   </p>
-                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <p className={`text-sm  text-gray-700 dark:text-gray-300`}>
                     {currentStepData.operation}
                   </p>
                 </div>
-                
-                <div className={`p-4 rounded-lg border-l-4 border-purple-500 ${
-                  darkMode ? 'bg-purple-900/20' : 'bg-purple-50'
-                }`}>
-                  <p className={`text-sm font-medium mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+
+                <div
+                  className={`p-4 rounded-lg border-l-4 border-purple-500 bg-purple-50 dark:bg-purple-900/20`}
+                >
+                  <p
+                    className={`text-sm font-medium mb-2  text-gray-800 dark:text-white `}
+                  >
                     What's Happening:
                   </p>
-                  <p className={`text-sm leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <p
+                    className={`text-sm leading-relaxed  text-gray-700 dark:text-gray-300`}
+                  >
                     {typewriterText}
-                    <span className="animate-blink">|</span>
+                    <span className='animate-blink'>|</span>
                   </p>
                 </div>
 
                 {selectedAlgorithm && (
-                  <div className={`p-4 rounded-lg border-l-4 border-green-500 ${
-                    darkMode ? 'bg-green-900/20' : 'bg-green-50'
-                  }`}>
-                    <p className={`text-sm font-medium mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  <div
+                    className={`p-4 rounded-lg border-l-4 border-green-500 bg-green-50 dark:bg-green-900/20`}
+                  >
+                    <p
+                      className={`text-sm font-medium mb-2 text-gray-800 dark:text-white `}
+                    >
                       Algorithm Info:
                     </p>
-                    <p className={`text-sm leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <p
+                      className={`text-sm leading-relaxed text-gray-700 dark:text-gray-300`}
+                    >
                       {selectedAlgorithm.explanation}
                     </p>
                   </div>
@@ -612,22 +625,35 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
 
                 {/* Detailed Log */}
                 {showDetailedLog && (
-                  <div className={`p-4 rounded-lg ${
-                    darkMode ? 'bg-gray-800/50' : 'bg-gray-100'
-                  }`}>
-                    <h5 className={`text-sm font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  <div
+                    className={`p-4 rounded-lg bg-gray-100 dark:bg-gray-800/50`}
+                  >
+                    <h5
+                      className={`text-sm font-bold mb-2  text-gray-800 dark:text-white`}
+                    >
                       Step History:
                     </h5>
-                    <div className="space-y-1 max-h-32 overflow-y-auto">
-                      {steps.slice(Math.max(0, currentStep - 5), currentStep + 1).map((step, index) => (
-                        <div key={index} className={`text-xs p-2 rounded ${
-                          index === 5 || index === steps.slice(Math.max(0, currentStep - 5), currentStep + 1).length - 1
-                            ? (darkMode ? 'bg-blue-800/50 text-blue-200' : 'bg-blue-100 text-blue-800')
-                            : (darkMode ? 'text-gray-400' : 'text-gray-600')
-                        }`}>
-                          {step.operation}
-                        </div>
-                      ))}
+                    <div className='space-y-1 max-h-32 overflow-y-auto'>
+                      {steps
+                        .slice(Math.max(0, currentStep - 5), currentStep + 1)
+                        .map((step, index) => (
+                          <div
+                            key={index}
+                            className={`text-xs p-2 rounded ${
+                              index === 5 ||
+                              index ===
+                                steps.slice(
+                                  Math.max(0, currentStep - 5),
+                                  currentStep + 1
+                                ).length -
+                                  1
+                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-800/50 dark:text-blue-200'
+                                : 'text-gray-600 dark:text-gray-400'
+                            }`}
+                          >
+                            {step.operation}
+                          </div>
+                        ))}
                     </div>
                   </div>
                 )}
@@ -637,77 +663,83 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
         </div>
 
         {/* Enhanced Bottom Panel - Analysis & Metrics */}
-        <div className="mt-8 grid md:grid-cols-2 gap-8">
-          <div className={`backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden ${
-            darkMode 
-              ? 'bg-gray-800/20 border-gray-700/50' 
-              : 'bg-white/20 border-white/50'
-          }`}>
-            <div className={`p-4 border-b ${darkMode ? 'border-gray-700/50' : 'border-white/50'}`}>
-              <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+        <div className='mt-8 grid md:grid-cols-2 gap-8'>
+          <div
+            className={`backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden bg-white/20 border-white/50 dark:bg-gray-800/20 dark:border-gray-700/50 `}
+          >
+            <div
+              className={`p-4 border-b border-white/50 dark:border-gray-700/50`}
+            >
+              <h3 className={`text-lg font-bold text-gray-800 dark:text-white`}>
                 Complexity Analysis
               </h3>
             </div>
-            <div className="p-6">
+            <div className='p-6'>
               <ComplexityDisplay
                 algorithm={selectedAlgorithm}
                 currentData={currentStepData}
                 steps={steps}
-                darkMode={darkMode}
                 enhanced={true}
               />
             </div>
           </div>
 
-          <div className={`backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden ${
-            darkMode 
-              ? 'bg-gray-800/20 border-gray-700/50' 
-              : 'bg-white/20 border-white/50'
-          }`}>
-            <div className={`p-4 border-b ${darkMode ? 'border-gray-700/50' : 'border-white/50'}`}>
-              <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+          <div
+            className={`backdrop-blur-xl rounded-2xl shadow-2xl border overflow-hidden bg-white/20 border-white/50 dark:bg-gray-800/20 dark:border-gray-700/50`}
+          >
+            <div
+              className={`p-4 border-b border-white/50 dark:border-gray-700/50`}
+            >
+              <h3 className={`text-lg font-bold text-gray-800 dark:text-white`}>
                 Performance Metrics
               </h3>
             </div>
-            <div className="p-6">
-              <div className="grid grid-cols-2 gap-6">
-                <div className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all ${
-                  darkMode ? 'bg-blue-900/30' : 'bg-blue-50'
-                }`}>
-                  <div className="text-3xl font-bold text-blue-600 animate-pulse">
+            <div className='p-6'>
+              <div className='grid grid-cols-2 gap-6'>
+                <div
+                  className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all bg-blue-50 dark:bg-blue-900/30`}
+                >
+                  <div className='text-3xl font-bold text-blue-600 animate-pulse'>
                     {array.length}
                   </div>
-                  <div className={`text-sm ${darkMode ? 'text-blue-300' : 'text-blue-600'}`}>
+                  <div className={`text-sm text-blue-600 dark:text-blue-300`}>
                     Array Size
                   </div>
                 </div>
-                <div className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all ${
-                  darkMode ? 'bg-green-900/30' : 'bg-green-50'
-                }`}>
-                  <div className="text-3xl font-bold text-green-600 animate-pulse">
+                <div
+                  className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all bg-green-50 dark:bg-green-900/30`}
+                >
+                  <div className='text-3xl font-bold text-green-600 animate-pulse'>
                     {steps.length}
                   </div>
-                  <div className={`text-sm ${darkMode ? 'text-green-300' : 'text-green-600'}`}>
+                  <div className={`text-sm text-green-600 dark:text-green-300`}>
                     Total Steps
                   </div>
                 </div>
-                <div className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all ${
-                  darkMode ? 'bg-purple-900/30' : 'bg-purple-50'
-                }`}>
-                  <div className="text-3xl font-bold text-purple-600 animate-pulse">
+                <div
+                  className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all bg-purple-50 dark:bg-purple-900/30`}
+                >
+                  <div className='text-3xl font-bold text-purple-600 animate-pulse'>
                     {currentStepData.operations_count || 0}
                   </div>
-                  <div className={`text-sm ${darkMode ? 'text-purple-300' : 'text-purple-600'}`}>
+                  <div
+                    className={`text-sm text-purple-600 dark:text-purple-300`}
+                  >
                     Operations
                   </div>
                 </div>
-                <div className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all ${
-                  darkMode ? 'bg-orange-900/30' : 'bg-orange-50'
-                }`}>
-                  <div className="text-3xl font-bold text-orange-600 animate-pulse">
-                    {steps.length > 0 ? Math.round((currentStep / (steps.length - 1)) * 100) : 0}%
+                <div
+                  className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all bg-orange-50 dark:bg-orange-900/30`}
+                >
+                  <div className='text-3xl font-bold text-orange-600 animate-pulse'>
+                    {steps.length > 0
+                      ? Math.round((currentStep / (steps.length - 1)) * 100)
+                      : 0}
+                    %
                   </div>
-                  <div className={`text-sm ${darkMode ? 'text-orange-300' : 'text-orange-600'}`}>
+                  <div
+                    className={`text-sm text-orange-600 dark:text-orange-300`}
+                  >
                     Progress
                   </div>
                 </div>
@@ -716,10 +748,10 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
           </div>
         </div>
       </div>
-
       {/* Custom CSS for animations */}
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
           @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
@@ -734,10 +766,11 @@ const SortingVisualizer = ({ darkMode, setDarkMode }) => {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
           }
-        `
-      }} />
+        `,
+        }}
+      />
     </div>
-  );
-};
+  )
+}
 
-export default SortingVisualizer;
+export default SortingVisualizer
