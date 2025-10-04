@@ -1,15 +1,18 @@
-import React from 'react'
-import Navbar from './Navbar'
-import Footer from './Footer'
+import React from "react";
+import { useTheme } from "../../contexts/ThemeContext";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
 
-const Layout = ({ children, theme, onThemeChange }) => {
+const Layout = ({ children }) => {
+  const { classes } = useTheme();
+  
   return (
-    <div className='min-h-screen'>
-      <Navbar theme={theme} onThemeChange={onThemeChange} />
-      <main>{children}</main>
-      <Footer theme={theme} />
+    <div className={`min-h-screen ${classes.bgPrimary} ${classes.textPrimary}`}>
+      <Navbar />
+      {children}
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;
