@@ -6,23 +6,23 @@ const ComplexityDisplay = ({ algorithm, currentData, steps }) => {
 
   return (
     <div className='space-y-3'>
-      <div className='flex items-center space-x-2 text-blue-600'>
+      <div className='flex items-center space-x-2 text-blue-600 dark:text-blue-300'>
         <Clock className='h-4 w-4' />
         <span className='font-medium text-sm'>Time Complexity</span>
       </div>
-      <div className='text-lg font-bold text-blue-600 ml-6'>
+      <div className='text-lg font-bold text-blue-600 dark:text-blue-300 ml-6'>
         {algorithm.complexity}
       </div>
 
-      <div className='flex items-center space-x-2 text-green-600'>
+      <div className='flex items-center space-x-2 text-green-600 dark:text-green-300'>
         <MemoryStick className='h-4 w-4' />
         <span className='font-medium text-sm'>Space Complexity</span>
       </div>
-      <div className='text-lg font-bold text-green-600 ml-6'>
+      <div className='text-lg font-bold text-green-600 dark:text-green-300 ml-6'>
         {currentData?.space_complexity || 'O(1)'}
       </div>
 
-      <div className='flex items-center space-x-2 text-purple-600'>
+      <div className='flex items-center space-x-2 text-purple-600 dark:text-purple-300'>
         <Cpu className='h-4 w-4' />
         <span className='font-medium text-sm'>Performance</span>
       </div>

@@ -372,7 +372,7 @@ const SortingVisualizer = ({ darkMode }) => {
 
   return (
     <div
-      className='py-16 min-h-screen transition-all duration-500  bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 
+      className='py-16 min-h-screen transition-all duration-500  bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50
           dark:bg-gradient-to-br dark:from-gray-900 dark:via-blue-900 dark:to-purple-900'
     >
       {/* Conditional Particle Background */}
@@ -699,7 +699,7 @@ const SortingVisualizer = ({ darkMode }) => {
                 <div
                   className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all bg-blue-50 dark:bg-blue-900/30`}
                 >
-                  <div className='text-3xl font-bold text-blue-600 animate-pulse'>
+                  <div className='text-3xl font-bold text-blue-600 animate-pulse dark:text-blue-300'>
                     {array.length}
                   </div>
                   <div className={`text-sm text-blue-600 dark:text-blue-300`}>
@@ -709,7 +709,7 @@ const SortingVisualizer = ({ darkMode }) => {
                 <div
                   className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all bg-green-50 dark:bg-green-900/30`}
                 >
-                  <div className='text-3xl font-bold text-green-600 animate-pulse'>
+                  <div className='text-3xl font-bold text-green-600 animate-pulse dark:text-green-300'>
                     {steps.length}
                   </div>
                   <div className={`text-sm text-green-600 dark:text-green-300`}>
@@ -719,7 +719,7 @@ const SortingVisualizer = ({ darkMode }) => {
                 <div
                   className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all bg-purple-50 dark:bg-purple-900/30`}
                 >
-                  <div className='text-3xl font-bold text-purple-600 animate-pulse'>
+                  <div className='text-3xl font-bold text-purple-600 animate-pulse dark:text-purple-300'>
                     {currentStepData.operations_count || 0}
                   </div>
                   <div
@@ -731,7 +731,7 @@ const SortingVisualizer = ({ darkMode }) => {
                 <div
                   className={`p-6 rounded-xl text-center transform hover:scale-105 transition-all bg-orange-50 dark:bg-orange-900/30`}
                 >
-                  <div className='text-3xl font-bold text-orange-600 animate-pulse'>
+                  <div className='text-3xl font-bold text-orange-600 animate-pulse dark:text-orange-300'>
                     {steps.length > 0
                       ? Math.round((currentStep / (steps.length - 1)) * 100)
                       : 0}

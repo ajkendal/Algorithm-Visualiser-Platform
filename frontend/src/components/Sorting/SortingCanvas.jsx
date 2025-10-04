@@ -106,7 +106,7 @@ const SortingCanvas = forwardRef(
     }, [])
 
     return (
-      <div className='border-2 border-gray-200 rounded-lg overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 shadow-inner'>
+      <div className='border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 shadow-inner'>
         <canvas
           ref={canvasRef}
           width={600}

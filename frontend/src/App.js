@@ -66,7 +66,10 @@ function App() {
               path='/sorting'
               element={<SortingVisualizer darkMode={darkMode} />}
             />
-            <Route path='/graph' element={<GraphVisualizer theme={theme} />} />
+            <Route
+              path='/graph'
+              element={<GraphVisualizer darkMode={darkMode} />}
+            />
             <Route
               path='/string'
               element={<StringVisualizer theme={theme} />}

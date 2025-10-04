@@ -117,7 +117,7 @@ const ControlPanel = ({
       </div>
 
       {/* Enhanced Stats */}
-      <div className='bg-gray-50 rounded-lg p-3 dark:bg-gray-800'>
+      <div className='bg-gray-50 rounded-lg p-3  dark:bg-gray-800'>
         <div className='text-sm text-gray-700 space-y-2 '>
           <div className='flex justify-between'>
             <span className='text-gray-600 dark:text-white'>Current Step:</span>
